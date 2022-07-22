@@ -37,6 +37,10 @@ MonoBehaviour:
   - ClickRpc
   - DestroyRpc
   - RPC_SetStartPositionIndex
+  - RPC_NotifySpawnedPlayer
+  - RPC_UpdateLeaderboardInRoom
+  - RPC_NotifyPlayerReady
+  - RPC_SyncPlayerInfo
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

@@ -19,6 +19,8 @@ public class PlayerInitialPropertiesView : MonoBehaviourPun
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             int[] playerPositionIndexes = playerInitialProperties.RandomPositionsIndex(PhotonNetwork.PlayerList.Length);
+            //int[] playerPositionIndexes = playerInitialProperties.RandomPositionsIndex(8);
+
             int i = 0;
             foreach(Player player in PhotonNetwork.PlayerList)
             {
@@ -26,11 +28,19 @@ public class PlayerInitialPropertiesView : MonoBehaviourPun
                 i++;
             }
         } 
+        
     }
 
     [PunRPC]
     void RPC_SetStartPositionIndex(int index)
     {
         PlayerInitialProperties.startPositionIndex = index;
+        photonView.RPC(nameof(RPC_NotifyPlayerReady), RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    void RPC_NotifyPlayerReady()
+    {
+        GetComponent<PlayerInitialProperties>().readyPlayerCount++;
     }
 }
