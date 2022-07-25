@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.UI;
 
 public class PlayerNetworkView : MonoBehaviourPun
 {
     [SerializeField] PlayerInput playerInput;
+    [SerializeField] Text PlayernameText;
 
     private void Awake()
     {
@@ -21,7 +23,7 @@ public class PlayerNetworkView : MonoBehaviourPun
             Destroy(GetComponent<Controller>());
 
             //Test.
-            GetComponent<SpriteRenderer>().color = new Color(Random.Range(0, 2), Random.Range(0, 2), Random.Range(0, 2));
+            GetComponent<SpriteRenderer>().color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         }
         else
         {
@@ -36,7 +38,8 @@ public class PlayerNetworkView : MonoBehaviourPun
     public void SyncPlayerInfo()
     {
         photonView.RPC(nameof(RPC_SyncPlayerInfo), RpcTarget.AllBuffered,
-            PhotonNetwork.LocalPlayer.ActorNumber, PhotonNetwork.LocalPlayer.NickName, PlayerInitialProperties.startPositionIndex);
+            PhotonNetwork.LocalPlayer.ActorNumber, PhotonNetwork.LocalPlayer.NickName, (PhotonNetwork.PlayerList.Length - 1) -
+                PlayerInitialProperties.startPositionIndex);
     }
 
     [PunRPC]
@@ -46,6 +49,10 @@ public class PlayerNetworkView : MonoBehaviourPun
         playerInput.playerName = playername;
         FindObjectOfType<PlayerManager>().AddPlayerToLeaderboard(id, playername);
         GetComponent<SpriteRenderer>().sortingOrder = layerOrder;
+        GetComponentInChildren<MeshRenderer>().sortingOrder = layerOrder;
         FindObjectOfType<PlayerManagerView>().settedPlayersCount++;
+
+        //
+        PlayernameText.text = playername;
     }
 }

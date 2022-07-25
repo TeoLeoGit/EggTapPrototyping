@@ -28,6 +28,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateLeaderboardUI(List<PlayerStats> playerRankList)
     {
+        Debug.Log("Updating UI.");
         for (int i = 0; i < rowsTransforms.Count; i++)
         {
             rowsTransforms[i].Find("Playername").GetComponent<Text>().text = playerRankList[i].playerName;

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
+using DG.Tweening;
+
 public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
 {
-    public Transform startPosition; //EggTap: For debugging.
+    /*public Controller controller;*/ //EggTap: For debugging.
     public bool isAt1stPosition = false;
     public Vector3 gapDistance; //EggTap: Distance between real position on other clients and local client. Assign when player is spawned.
     private float m_Distance;
@@ -26,7 +28,8 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
 
     public void Awake()
     {
-        m_StoredPosition = transform.localPosition; 
+        m_StoredPosition = transform.localPosition;
+        /*m_StoredPosition = controller.target.localPosition;*/
 
         m_NetworkPosition = Vector3.zero;
 
@@ -38,6 +41,8 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
         if(photonView.IsMine)
         {
             m_StoredPosition = transform.localPosition + gapDistance; //EggTap: Real position on other clients.
+            /*m_StoredPosition = controller.target.localPosition + gapDistance;*/ //EggTap: Real position on other clients.
+
         }
     }
 
@@ -55,6 +60,7 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
     public void Update()
     {
         var tr = transform;
+        /*var tr = controller.target;*/
 
         if (!this.photonView.IsMine)
         {
@@ -62,10 +68,12 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
 
             {
                 tr.localPosition = Vector3.MoveTowards(tr.localPosition, this.m_NetworkPosition, this.m_Distance * Time.deltaTime * PhotonNetwork.SerializationRate);
+               /* transform.DOMove(controller.target.position, 1.5f).SetEase(Ease.OutCubic);*/
                 tr.localRotation = Quaternion.RotateTowards(tr.localRotation, this.m_NetworkRotation, this.m_Angle * Time.deltaTime * PhotonNetwork.SerializationRate);
             }
             else
             {
+                /*transform.DOMove(controller.target.position, 1.5f).SetEase(Ease.OutCubic);*/
                 tr.position = Vector3.MoveTowards(tr.position, this.m_NetworkPosition, this.m_Distance * Time.deltaTime * PhotonNetwork.SerializationRate);
                 tr.rotation = Quaternion.RotateTowards(tr.rotation, this.m_NetworkRotation, this.m_Angle * Time.deltaTime * PhotonNetwork.SerializationRate);
             }
@@ -75,8 +83,8 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         var tr = transform;
+        /*var tr = controller.target;*/
 
-        //EggTap: Modify transform before sending to match actual position on other clients.
         // Write
         if (stream.IsWriting)
         {
@@ -87,6 +95,7 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
                 {
                     this.m_Direction = tr.localPosition + gapDistance - this.m_StoredPosition;
                     this.m_StoredPosition = tr.localPosition + gapDistance;
+                    /*stream.SendNext(tr.localPosition + gapDistance);*/
                     stream.SendNext(tr.localPosition + gapDistance);
                     stream.SendNext(this.m_Direction);
                 }
@@ -94,6 +103,7 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
                 {
                     this.m_Direction = tr.position + gapDistance - this.m_StoredPosition;
                     this.m_StoredPosition = tr.position + gapDistance;
+                    /*stream.SendNext(tr.position + gapDistance);*/
                     stream.SendNext(tr.position + gapDistance);
                     stream.SendNext(this.m_Direction);
                 }

@@ -14,6 +14,13 @@ public struct PlayerStats
         this.playerName = playerName;
         this.distance = 0;
     }
+
+    public PlayerStats(int playerId, string playerName, float distance) : this()
+    {
+        this.playerId = playerId;
+        this.playerName = playerName;
+        this.distance = distance;
+    }
 }
 public class PlayerManager : MonoBehaviour
 {
@@ -28,8 +35,10 @@ public class PlayerManager : MonoBehaviour
     public GameObject LocalPlayerObject { set { localPlayer = value; } get { return localPlayer; } }
     public void UpdatePlayerScore(int playerId, float distance)
     {
-        PlayerStats update = playerRankList.Find(x => x.playerId == playerId);
-        update.distance = distance;
+        int index = playerRankList.FindIndex(x => x.playerId == playerId);
+        Debug.Log("Found player: " + playerRankList[index]);
+        playerRankList[index] = new PlayerStats(playerId, playerRankList[index].playerName, distance);
+        
         ResetRank();
         onPlayerScoreUpdate(playerRankList);
     }

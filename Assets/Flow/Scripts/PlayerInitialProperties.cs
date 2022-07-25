@@ -25,11 +25,6 @@ public class PlayerInitialProperties : MonoBehaviour
             playerPositionIndexes[randomIndex] = prevIndex;
         }
 
-        //Debuging
-        foreach(int i in playerPositionIndexes)
-        {
-            Debug.Log("Position random: "+ i);
-        }
         return playerPositionIndexes;
     }
 
