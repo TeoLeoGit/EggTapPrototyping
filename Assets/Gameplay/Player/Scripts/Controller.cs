@@ -11,56 +11,37 @@ public class Controller : MonoBehaviour
     [SerializeField] float runLengtth;
     
     public int clickCount = 0;
-    public float goalXPosition;
+    public float distanceToGoal;
 
     public event Action<int, float> onEnoughClickCount;
-    [SerializeField] PlayerInput playerInput;
-    Animator animator;
+    [SerializeField] PlayerStatus playerStatus;
 
     //Test
-    public float tapRate;
-    float currentTapRate = 0f;
-    bool isAllowedToMove = false;
+    public Animator animator;
     public Vector3 target;
-    private void Awake()
-    {
-        tapRate = UnityEngine.Random.Range(0.05f, 0.1f);
-        StartCoroutine(AutoMoveTest());
-    }
+
+    public float jumpForce;
+    public float jumpDuration;
+    public float jumpLength;
 
 
     private void Start()
     {
-        playerInput = GetComponent<PlayerInput>();
+        playerStatus = GetComponent<PlayerStatus>();
         animator = GetComponentInChildren<Animator>();
+        StartCoroutine(SetTargetAfterSwappingPosEnum());
     }
-
-    IEnumerator AutoMoveTest()
+    IEnumerator SetTargetAfterSwappingPosEnum()
     {
         yield return new WaitForSeconds(3f);
         target = transform.position;
-        isAllowedToMove = true;
-    }
-    private void FixedUpdate()
-    {
-        if (!isAllowedToMove)
-            return;
-        if (currentTapRate <= 0)
-        {
-            Move();
-            currentTapRate = tapRate;
-        }
-        else
-        {
-            animator.SetBool("running", true);
-            currentTapRate -= Time.fixedDeltaTime;
-        }
     }
     public void Move()
     {   
         target += Vector3.right * runLengtth;
 
         transform.DOMove(target, duration);
+        transform.DOJump(transform.right + Vector3.right * jumpLength, jumpForce, 1, jumpDuration);
         clickCount++;
         animator.SetBool("running", true);
         
@@ -68,13 +49,13 @@ public class Controller : MonoBehaviour
         //Test
         if (clickCount == numberOfClickTillRankUpdate)
         {
-            onEnoughClickCount(playerInput.playerId, goalXPosition - transform.position.x);
+            onEnoughClickCount(playerStatus.playerId, distanceToGoal - transform.position.x); //Cuz we only moving on x axis.
             clickCount = 0;
         }
     }
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(target, 0.2f);//ve diem target
+        Gizmos.DrawSphere(target, 0.2f);
     }
 
 }

@@ -41,6 +41,8 @@ MonoBehaviour:
   - RPC_UpdateLeaderboardInRoom
   - RPC_NotifyPlayerReady
   - RPC_SyncPlayerInfo
+  - RPC_AddNewFinishedPlayer
+  - RPC_NotifyReadyPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

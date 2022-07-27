@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-using DG.Tweening;
-
 public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
 {
     /*public Controller controller;*/ //EggTap: For debugging.
@@ -41,7 +39,6 @@ public class EggTapPhotonTransformView : MonoBehaviourPun, IPunObservable
         if(photonView.IsMine)
         {
             m_StoredPosition = transform.localPosition + gapDistance; //EggTap: Real position on other clients.
-            /*m_StoredPosition = controller.target.localPosition + gapDistance;*/ //EggTap: Real position on other clients.
 
         }
     }

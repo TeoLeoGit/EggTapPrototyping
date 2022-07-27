@@ -16,8 +16,10 @@ public class PlayerSpawner : MonoBehaviourPun
         //Instantiate player -> Adding gap distance between real position and first position to network view.
         //Add listener to UI for events.
         localPlayerTransform = PhotonNetwork.Instantiate(playerPrefab.name, startPositions[posIndex].position, Quaternion.identity).transform;
-        localPlayerTransform.GetComponent<EggTapPhotonTransformView>().gapDistance = startPositions[posIndex].position - startPositions[0].position;
-        
+        /*localPlayerTransform.GetComponent<EggTapPhotonTransformView>().gapDistance = startPositions[posIndex].position - startPositions[0].position;*/
+
+        //Test tweening transformview
+        localPlayerTransform.GetComponent<TweeningTransformView>().gapDistance = startPositions[posIndex].position - startPositions[0].position;
         GetComponent<PlayerManager>().LocalPlayerObject = localPlayerTransform.gameObject;
 
         FindObjectOfType<UIManager>().tapButton.onClick.AddListener(localPlayerTransform.GetComponent<Controller>().Move);
@@ -26,7 +28,10 @@ public class PlayerSpawner : MonoBehaviourPun
     public void SwapLocalPlayerToFirstPosition(Transform playerTransform, int prevPosIndex)
     {
         if (prevPosIndex == 0)
+        {
+            FindObjectOfType<LevelNetworking>().NotifyLocalPlayerReady();
             return;
+        }
         playerTransform.position = startPositions[0].position;
 
         //Find and swap position with player at first place.
@@ -48,10 +53,17 @@ public class PlayerSpawner : MonoBehaviourPun
                 playerTransform.GetComponentInChildren<MeshRenderer>().sortingOrder = PhotonNetwork.PlayerList.Length - 1;
 
                 //Mark the previous player at 1st position because he has difference way to sync movement.
-                EggTapPhotonTransformView transformView = playerView.GetComponent<EggTapPhotonTransformView>();
+                /* EggTapPhotonTransformView transformView = playerView.GetComponent<EggTapPhotonTransformView>();
+                 transformView.isAt1stPosition = true;
+                 transformView.gapDistance = startPositions[prevPosIndex].position - startPositions[0].position;*/
+
+                //Testing tweening synch
+                TweeningTransformView transformView = playerView.GetComponent<TweeningTransformView>();
                 transformView.isAt1stPosition = true;
                 transformView.gapDistance = startPositions[prevPosIndex].position - startPositions[0].position;
+                //
 
+                FindObjectOfType<LevelNetworking>().NotifyLocalPlayerReady(); //Ready
                 return;
             }
         }

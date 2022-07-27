@@ -6,12 +6,20 @@ using UnityEngine.UI;
 
 public class PlayerNetworkView : MonoBehaviourPun
 {
-    [SerializeField] PlayerInput playerInput;
+    [SerializeField] PlayerStatus playerStatus;
     [SerializeField] Text PlayernameText;
+
+    //test
+    public Controller controller;
+    public float tapRate;
+    float currentTapRate = 0f;
+    bool isAllowedToMove = false;
+
 
     private void Awake()
     {
-        playerInput = GetComponent<PlayerInput>();
+        playerStatus = GetComponent<PlayerStatus>();
+        tapRate = Random.Range(0.2f, 0.8f);
 
     }
     private void Start()
@@ -30,9 +38,32 @@ public class PlayerNetworkView : MonoBehaviourPun
             GetComponent<Controller>().onEnoughClickCount += FindObjectOfType<PlayerManagerView>().UpdateLeaderboardInRoom;
             //Test.
             GetComponent<SpriteRenderer>().color = Color.green;
+            StartCoroutine(AutoMoveTest());
         }
         
 
+    }
+
+    IEnumerator AutoMoveTest()
+    {
+        yield return new WaitForSeconds(3f);
+        controller.target = transform.position;
+        isAllowedToMove = true;
+    }
+    private void FixedUpdate()
+    {
+        if (!isAllowedToMove)
+            return;
+        if (currentTapRate <= 0)
+        {
+            controller.Move();
+            currentTapRate = tapRate;
+        }
+        else
+        {
+            controller.animator.SetBool("running", true);
+            currentTapRate -= Time.fixedDeltaTime;
+        }
     }
 
     public void SyncPlayerInfo()
@@ -45,14 +76,14 @@ public class PlayerNetworkView : MonoBehaviourPun
     [PunRPC]
     void RPC_SyncPlayerInfo(int id, string playername, int layerOrder)
     {
-        playerInput.playerId = id;
-        playerInput.playerName = playername;
+        playerStatus.playerId = id;
+        playerStatus.playerName = playername;
         FindObjectOfType<PlayerManager>().AddPlayerToLeaderboard(id, playername);
         GetComponent<SpriteRenderer>().sortingOrder = layerOrder;
         GetComponentInChildren<MeshRenderer>().sortingOrder = layerOrder;
         FindObjectOfType<PlayerManagerView>().settedPlayersCount++;
-
-        //
+        controller.distanceToGoal = FindObjectOfType<GameLevel>().distanceToGoal;
+        //Test
         PlayernameText.text = playername;
     }
 }
